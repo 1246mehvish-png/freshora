@@ -1,0 +1,138 @@
+.contact-page .page-banner {
+    background: linear-gradient(135deg, var(--dark-green) 0%, var(--fresh-green) 100%);
+    color: #fff;
+    padding: 70px 0;
+    text-align: center;
+}
+
+.contact-page .page-banner h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.contact-page .page-banner p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 50px;
+}
+
+.contact-info h2,
+.contact-form-wrap h2 {
+    color: var(--dark-green);
+    font-size: 1.6rem;
+    margin-bottom: 12px;
+}
+
+.contact-info>p {
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+
+.contact-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.contact-item .contact-icon {
+    font-size: 1.6rem;
+    background: rgba(76, 175, 80, 0.1);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contact-item h4 {
+    color: var(--dark-green);
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.contact-item a {
+    color: var(--fresh-green);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contact-item a:hover {
+    text-decoration: underline;
+}
+
+.contact-item p {
+    color: #666;
+}
+
+.contact-hours {
+    margin-top: 24px;
+    background: var(--light-cream);
+    padding: 20px;
+    border-radius: 14px;
+}
+
+.contact-hours h4 {
+    color: var(--dark-green);
+    margin-bottom: 10px;
+}
+
+.contact-hours p {
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.contact-form-wrap {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 18px;
+    padding: 36px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+}
+
+.contact-form .form-group {
+    margin-bottom: 18px;
+}
+
+.contact-form label {
+    display: block;
+    font-weight: 600;
+    color: var(--dark-green);
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.3s;
+    background: #fafafa;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    outline: none;
+    border-color: var(--fresh-green);
+    background: #fff;
+}
+
+@media (max-width: 900px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}

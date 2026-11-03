@@ -1,0 +1,137 @@
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, var(--dark-green) 0%, var(--fresh-green) 100%);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 36px;
+    border-radius: var(--radius-lg);
+}
+
+.auth-card-lg {
+    max-width: 640px;
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.auth-logo img {
+    height: 44px;
+}
+
+.auth-logo h1 {
+    font-size: 1.8rem;
+    color: var(--dark-green);
+    font-weight: 800;
+}
+
+.auth-logo h1 span {
+    color: var(--fresh-green);
+}
+
+.auth-welcome {
+    text-align: center;
+    color: var(--dark-green);
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.auth-sub {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+}
+
+.role-tabs {
+    display: flex;
+    background: var(--cream);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 24px;
+    gap: 4px;
+}
+
+.role-tabs button {
+    flex: 1;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.role-tabs button.active {
+    background: var(--fresh-green);
+    color: var(--white);
+    box-shadow: var(--shadow-sm);
+}
+
+.auth-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    font-size: 0.85rem;
+}
+
+.remember {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+}
+
+.forgot {
+    color: var(--fresh-green);
+    font-weight: 600;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.auth-switch a {
+    color: var(--fresh-green);
+    font-weight: 700;
+}
+
+.auth-admin {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 0.8rem;
+}
+
+.auth-admin a {
+    color: var(--text-muted);
+    text-decoration: underline;
+}
+
+.form-section-title {
+    color: var(--dark-green);
+    font-size: 1rem;
+    margin: 20px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--fresh-green-light);
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 24px;
+    }
+}
