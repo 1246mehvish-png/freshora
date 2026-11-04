@@ -5,6 +5,12 @@ import { useToast } from '../context/ToastContext';
 import { useSettings } from '../context/SettingsContext';
 import './Auth.css';
 
+const ROLES = [
+    { key: 'buyer', label: '🛒 Buyer', demo: { email: 'buyer@freshora.com', password: 'Buyer@123' } },
+    { key: 'seller', label: '🏪 Seller', demo: { email: 'seller@freshora.com', password: 'Seller@123' } },
+    { key: 'admin', label: '🛠️ Admin', demo: { email: 'admin@freshora.com', password: 'Admin@123' } },
+];
+
 export default function Login() {
     const { login, loading } = useAuth();
     const toast = useToast();
@@ -16,6 +22,19 @@ export default function Login() {
     const [error, setError] = useState('');
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+    const selectRole = (nextRole) => {
+        setRole(nextRole);
+        setError('');
+    };
+
+    const fillDemo = (e) => {
+        e.preventDefault();
+        const demo = ROLES.find((r) => r.key === role)?.demo;
+        if (!demo) return;
+        setForm({ email: demo.email, password: demo.password });
+        setError('');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -42,14 +61,28 @@ export default function Login() {
                 <h2 className="auth-welcome">Welcome Back!</h2>
                 <p className="auth-sub">Login to continue shopping fresh</p>
 
-                <div className="role-tabs">
-                    <button className={role === 'buyer' ? 'active' : ''} onClick={() => setRole('buyer')}>
-                        🛒 Buyer
-                    </button>
-                    <button className={role === 'seller' ? 'active' : ''} onClick={() => setRole('seller')}>
-                        🏪 Seller
-                    </button>
+                <div className="role-tabs" role="tablist" aria-label="Login as">
+                    {ROLES.map((r) => (
+                        <button
+                            key={r.key}
+                            type="button"
+                            role="tab"
+                            aria-selected={role === r.key}
+                            className={role === r.key ? 'active' : ''}
+                            onClick={() => selectRole(r.key)}
+                        >
+                            {r.label}
+                        </button>
+                    ))}
                 </div>
+
+                <p className="role-hint">
+                    Logging in as <strong>{role}</strong>
+                    {' · '}
+                    <button type="button" className="link-btn" onClick={fillDemo}>
+                        Fill demo {role} login
+                    </button>
+                </p>
 
                 {error && <div className="alert alert-error">{error}</div>}
 
@@ -93,7 +126,9 @@ export default function Login() {
                     Don't have an account? <Link to="/register">Register here</Link>
                 </p>
                 <p className="auth-admin">
-                    <Link to="/login">Admin Login</Link>
+                    <button type="button" className="link-btn" onClick={() => selectRole('admin')}>
+                        Admin Login
+                    </button>
                 </p>
             </div>
         </div>

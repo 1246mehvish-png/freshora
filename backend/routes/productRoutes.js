@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
     createProduct,
+    createProductAsAdmin,
     getProducts,
     getProduct,
     getMyProducts,
@@ -21,6 +22,9 @@ router.get('/:id', getProduct);
 // Seller
 router.get('/my-products/list', protect, authorize('seller'), getMyProducts);
 router.post('/', protect, authorize('seller'), uploadMultiple, createProduct);
+
+// Admin
+router.post('/admin', protect, authorize('admin'), uploadMultiple, createProductAsAdmin);
 router.put('/:id', protect, authorize('seller', 'admin'), uploadMultiple, updateProduct);
 router.patch('/:id/availability', protect, authorize('seller', 'admin'), updateAvailability);
 router.delete('/:id', protect, authorize('seller', 'admin'), deleteProduct);

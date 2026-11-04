@@ -144,10 +144,14 @@ const login = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Please provide email and password' });
         }
 
-        const user = await User.findOne({ email }).select('+password');
+        const normalizedEmail = String(email).trim().toLowerCase();
+        const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
         if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+            return res.status(401).json({
+                success: false,
+                message: 'No account found with this email. Please check the spelling or register a new account.',
+            });
         }
 
         // Role check - if a role is specified, ensure it matches
@@ -160,7 +164,10 @@ const login = async (req, res, next) => {
 
         const isMatch = await user.matchPassword(password);
         if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+            return res.status(401).json({
+                success: false,
+                message: 'Incorrect password. Please try again or use "Forgot Password".',
+            });
         }
 
         if (user.status === 'suspended' || user.status === 'deactivated') {

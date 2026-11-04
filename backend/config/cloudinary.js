@@ -16,6 +16,8 @@ const storage = new CloudinaryStorage({
         folder: 'freshora',
         allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'],
         transformation: [{ width: 1000, height: 1000, crop: 'limit' }],
+        // Account requires an upload preset for signed uploads (otherwise 403 "missing permissions: create")
+        upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET || 'ml_default',
     },
 });
 

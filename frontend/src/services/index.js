@@ -39,6 +39,7 @@ export const productService = {
     getOne: (id) => api.get(`/products/${id}`),
     getMine: () => api.get('/products/my-products/list'),
     create: (data) => api.post('/products', data),
+    createAsAdmin: (data) => api.post('/products/admin', data),
     update: (id, data) => api.put(`/products/${id}`, data),
     updateAvailability: (id, availability) => api.patch(`/products/${id}/availability`, { availability }),
     delete: (id) => api.delete(`/products/${id}`),

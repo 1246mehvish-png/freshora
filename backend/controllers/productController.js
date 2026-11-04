@@ -72,6 +72,87 @@ const createProduct = async (req, res, next) => {
 };
 
 /**
+ * @desc    Create a product as admin (admin picks the seller)
+ * @route   POST /api/products/admin
+ * @access  Private/Admin
+ */
+const createProductAsAdmin = async (req, res, next) => {
+    try {
+        const {
+            sellerId,
+            productName,
+            category,
+            description,
+            price,
+            unit,
+            stock,
+            images,
+            freshnessInformation,
+            organic,
+            discount,
+            availability,
+            status,
+            isFeatured,
+            isTrending,
+            isBestSelling,
+            isSeasonal,
+        } = req.body;
+
+        if (!sellerId) return res.status(400).json({ success: false, message: 'Please select a seller' });
+        if (!productName || !String(productName).trim()) {
+            return res.status(400).json({ success: false, message: 'Product name is required' });
+        }
+        if (!category) return res.status(400).json({ success: false, message: 'Category is required' });
+        if (!description || !String(description).trim()) {
+            return res.status(400).json({ success: false, message: 'Description is required' });
+        }
+        if (price === undefined || price === '' || Number(price) < 0) {
+            return res.status(400).json({ success: false, message: 'Enter a valid price' });
+        }
+
+        const seller = await Seller.findById(sellerId);
+        if (!seller) return res.status(400).json({ success: false, message: 'Invalid seller' });
+
+        const cat = await Category.findById(category);
+        if (!cat) return res.status(400).json({ success: false, message: 'Invalid category' });
+
+        let imageUrls = [];
+        if (req.files && req.files.length) {
+            imageUrls = req.files.map((f) => f.path || f.location);
+        } else if (images) {
+            imageUrls = Array.isArray(images) ? images : [images];
+        }
+
+        const stockNum = Number(stock) || 0;
+
+        const product = await Product.create({
+            sellerId: seller._id,
+            productName: String(productName).trim(),
+            slug: slugify(productName) + '-' + Date.now().toString(36),
+            category,
+            description,
+            price: Number(price),
+            unit: unit || '1 kilogram',
+            stock: stockNum,
+            images: imageUrls,
+            freshnessInformation: freshnessInformation || '',
+            organic: organic === true || organic === 'true',
+            discount: Number(discount) || 0,
+            availability: availability || (stockNum > 0 ? 'in-stock' : 'out-of-stock'),
+            status: status || 'active',
+            isFeatured: isFeatured === true || isFeatured === 'true',
+            isTrending: isTrending === true || isTrending === 'true',
+            isBestSelling: isBestSelling === true || isBestSelling === 'true',
+            isSeasonal: isSeasonal === true || isSeasonal === 'true',
+        });
+
+        res.status(201).json({ success: true, message: 'Product added successfully', product });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * @desc    Get products with search, filter, sort, pagination
  * @route   GET /api/products
  * @access  Public
@@ -392,6 +473,7 @@ const getHomeData = async (req, res, next) => {
 
 module.exports = {
     createProduct,
+    createProductAsAdmin,
     getProducts,
     getProduct,
     getMyProducts,

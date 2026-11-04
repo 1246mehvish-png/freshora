@@ -197,6 +197,50 @@ Online payment methods are rendered as "Coming soon" until real credentials are 
 
 ---
 
+## 🌐 Single-Link Deployment (Frontend + Backend on one URL)
+
+The backend can serve the built React app, so the whole site runs on **one link**
+(e.g. `https://freshora.onrender.com`) — the API lives under `/api` on the same origin.
+
+### How it works
+- `frontend/src/services/api.js` uses the relative base URL `/api` when `VITE_API_URL` is not set.
+- [`backend/server.js`](backend/server.js) serves `frontend/dist` (if present) and falls back to
+  `index.html` for any non-`/api`, non-`/uploads` GET request (SPA routing).
+- CORS is only needed for split deployments; same-origin requests are always allowed.
+
+### Build & run locally (one link)
+```bash
+# from the project root
+npm run install:all   # installs backend + frontend deps
+npm run build         # builds frontend into frontend/dist
+npm start             # starts backend on http://localhost:5000 (serves the app too)
+```
+Open **http://localhost:5000** — frontend and API are on the same link.
+
+> For development with hot reload, keep using `npm run dev` in `backend/` and `frontend/`
+> (frontend at `http://localhost:5173`, proxying `/api` to the backend).
+
+### Deploy on Render (single service)
+1. Push the repo to GitHub.
+2. **New → Web Service**, connect the repo.
+3. Settings:
+   - **Root Directory:** *(leave empty — repo root)*
+   - **Build Command:** `npm run install:all && npm run build`
+   - **Start Command:** `npm start`
+4. **Environment variables** (from `backend/.env`):
+   - `NODE_ENV=production`
+   - `MONGO_URI` (MongoDB Atlas connection string)
+   - `JWT_SECRET`, `JWT_EXPIRES_IN`
+   - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+   - `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`
+   - `CLIENT_URL` — optional; set to your Render URL if you also use a separate frontend
+   - Do **not** set `PORT` (Render provides it automatically)
+5. Deploy. Your single link will be `https://<your-service>.onrender.com`.
+
+> On MongoDB Atlas, add `0.0.0.0/0` to **Network Access** so Render can connect.
+
+---
+
 ## 📄 License
 
 MIT

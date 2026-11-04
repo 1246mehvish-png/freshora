@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+// In production the frontend is served by the backend on the same origin,
+// so a relative "/api" base URL works for both. In local dev, Vite proxies
+// "/api" to http://localhost:5000 (see vite.config.js).
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
