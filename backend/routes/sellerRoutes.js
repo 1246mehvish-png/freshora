@@ -5,11 +5,15 @@ const {
     updateMySellerProfile,
     getPublicSeller,
     getAllSellers,
+    getAllSellersAdmin,
     updateSellerApproval,
     toggleFeatured,
     deleteSeller,
 } = require('../controllers/sellerController');
 const { protect, authorize } = require('../middleware/auth');
+
+// Admin (must be before /:id so "admin" is not treated as an id)
+router.get('/admin/all', protect, authorize('admin'), getAllSellersAdmin);
 
 // Public
 router.get('/', getAllSellers);

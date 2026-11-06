@@ -19,7 +19,7 @@ export default function AdminSellerRequests() {
 
     const load = async () => {
         try {
-            const res = await sellerService.getAll();
+            const res = await sellerService.getAllAdmin();
             setSellers(res.data.sellers || []);
         } catch (err) {
             toast.error(err.message || 'Failed to load sellers');

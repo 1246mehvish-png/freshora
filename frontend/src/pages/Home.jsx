@@ -52,7 +52,7 @@ export default function Home() {
     return (
         <div className="home">
             {/* Hero */}
-            <section className="hero" style={heroImage ? { backgroundImage: `url(${heroImage})` } : {}}>
+            <section className={`hero${heroImage ? ' has-banner' : ''}`} style={heroImage ? { backgroundImage: `url(${heroImage})` } : {}}>
                 <div className="hero-overlay" />
                 <div className="container hero-content">
                     <span className="hero-badge">🌿 100% Fresh & Organic</span>

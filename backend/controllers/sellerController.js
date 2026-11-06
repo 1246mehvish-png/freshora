@@ -108,6 +108,36 @@ const getAllSellers = async (req, res, next) => {
 };
 
 /**
+ * @desc    Get all sellers including pending/rejected (admin)
+ * @route   GET /api/sellers/admin/all
+ * @access  Private/Admin
+ */
+const getAllSellersAdmin = async (req, res, next) => {
+    try {
+        const { search, approvalStatus } = req.query;
+        const query = {};
+
+        if (approvalStatus && ['pending', 'approved', 'rejected'].includes(approvalStatus)) {
+            query.approvalStatus = approvalStatus;
+        }
+        if (search) {
+            query.$or = [
+                { storeName: { $regex: search, $options: 'i' } },
+                { businessType: { $regex: search, $options: 'i' } },
+            ];
+        }
+
+        const sellers = await Seller.find(query)
+            .populate('userId', 'name email phone whatsapp city province country status')
+            .sort('-createdAt');
+
+        res.json({ success: true, count: sellers.length, sellers });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * @desc    Approve / reject seller (admin)
  * @route   PUT /api/sellers/:id/approval
  * @access  Private/Admin
@@ -194,6 +224,7 @@ module.exports = {
     updateMySellerProfile,
     getPublicSeller,
     getAllSellers,
+    getAllSellersAdmin,
     updateSellerApproval,
     toggleFeatured,
     deleteSeller,

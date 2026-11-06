@@ -24,6 +24,7 @@ export const userService = {
 // ---------- Sellers ----------
 export const sellerService = {
     getAll: (params) => api.get('/sellers', { params }),
+    getAllAdmin: (params) => api.get('/sellers/admin/all', { params }),
     getPublic: (id) => api.get(`/sellers/${id}`),
     getMine: () => api.get('/sellers/me/profile'),
     updateMine: (data) => api.put('/sellers/me', data),

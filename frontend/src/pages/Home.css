@@ -15,6 +15,16 @@
     align-items: center;
 }
 
+/* When a banner image is set, show it clearly with a lighter overlay */
+.hero.has-banner {
+    background-size: cover;
+    background-position: center;
+}
+
+.hero.has-banner .hero-overlay {
+    background: linear-gradient(90deg, rgba(27, 94, 32, 0.88) 0%, rgba(27, 94, 32, 0.45) 55%, rgba(27, 94, 32, 0.15) 100%);
+}
+
 .hero-overlay {
     position: absolute;
     inset: 0;
