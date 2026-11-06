@@ -103,22 +103,33 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
+// Connect to MongoDB and seed default data.
+// This runs at module load time so it works BOTH when the app is started
+// directly (local dev: `node server.js`) AND when Vercel imports the app as a
+// serverless function (where `require.main !== module` and startServer() would
+// otherwise never run, leaving the app with no DB connection).
 const startServer = async () => {
     try {
         await connectDB();
         // Seed admin user + default settings if empty
         await require('./config/seed').ensureSeed();
-        app.listen(PORT, () => {
-            console.log(`Freshora backend running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-        });
+        if (require.main === module) {
+            app.listen(PORT, () => {
+                console.log(`Freshora backend running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+            });
+        }
     } catch (error) {
         console.error(`Server start error: ${error.message}`);
-        process.exit(1);
+        // On Vercel (serverless) we must not exit the process; the function
+        // will surface the error on the first request instead.
+        if (require.main === module) {
+            process.exit(1);
+        }
     }
 };
 
-if (require.main === module) {
-    startServer();
-}
+// Always connect on load (local + serverless). For local dev this also starts
+// the HTTP listener via app.listen() inside startServer().
+startServer();
 
 module.exports = app;
