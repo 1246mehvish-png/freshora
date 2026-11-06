@@ -19,8 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 // In single-link (same-origin) deployment the frontend is served by this
 // server, so CORS is not needed. It is still enabled for local dev / split
 // deployments via CLIENT_URL (comma-separated list of allowed origins).
-const allowedOrigins = (process.env.CLIENT_URL || '')
-    .split(',')
+const allowedOrigins = [
+    ...(process.env.CLIENT_URL || '').split(','),
+    // Vercel injects the deployment's own hostname; the frontend service is
+    // served from the same project domain, so allow it for cross-origin calls.
+    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+]
     .map((o) => o.trim())
     .filter(Boolean);
 
