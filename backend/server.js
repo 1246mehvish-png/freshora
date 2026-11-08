@@ -1,135 +1,40 @@
-const path = require('path');
-const fs = require('fs');
-const express = require('express');
-const cors = require('cors');
+/**
+ * Local development entry point.
+ *
+ * This file is ONLY used when running the backend directly (e.g. `npm start`
+ * or `node server.js`). It connects to MongoDB, seeds default data, and starts
+ * the HTTP listener.
+ *
+ * On Vercel, the serverless function in `api/index.js` (repo root) is used
+ * instead, which imports the shared Express app from `backend/app.js` and
+ * connects to MongoDB lazily per request. Keeping the DB connection out of the
+ * shared app module is what prevents the "FUNCTION_INVOCATION_FAILED" /
+ * "uri parameter ... got undefined" cold-start crash.
+ */
 const dotenv = require('dotenv');
 
 dotenv.config();
 
+const app = require('./app');
 const connectDB = require('./config/db');
-const { notFound, errorHandler } = require('./middleware/error');
-
-const app = express();
-
-// Body parser
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-// CORS
-// In single-link (same-origin) deployment the frontend is served by this
-// server, so CORS is not needed. It is still enabled for local dev / split
-// deployments via CLIENT_URL (comma-separated list of allowed origins).
-const allowedOrigins = [
-    ...(process.env.CLIENT_URL || '').split(','),
-    // Vercel injects the deployment's own hostname; the frontend service is
-    // served from the same project domain, so allow it for cross-origin calls.
-    ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
-]
-    .map((o) => o.trim())
-    .filter(Boolean);
-
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            // Allow requests with no origin (curl, same-origin, mobile apps)
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-                return callback(null, true);
-            }
-            return callback(null, false);
-        },
-        credentials: true,
-    })
-);
-
-// Static uploads folder (fallback when Cloudinary is not configured)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Request logger
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.originalUrl} - ${new Date().toISOString()}`);
-    next();
-});
-
-// Health check
-app.get('/api/health', (req, res) => {
-    res.json({
-        success: true,
-        message: 'Freshora API is running',
-        timestamp: new Date().toISOString(),
-    });
-});
-
-// Mount routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/sellers', require('./routes/sellerRoutes'));
-app.use('/api/products', require('./routes/productRoutes'));
-app.use('/api/categories', require('./routes/categoryRoutes'));
-app.use('/api/cart', require('./routes/cartRoutes'));
-app.use('/api/orders', require('./routes/orderRoutes'));
-app.use('/api/payments', require('./routes/paymentRoutes'));
-app.use('/api/upload', require('./routes/uploadRoutes'));
-app.use('/api/settings', require('./routes/settingsRoutes'));
-app.use('/api/notifications', require('./routes/notificationRoutes'));
-app.use('/api/contact', require('./routes/contactRoutes'));
-app.use('/api/reviews', require('./routes/reviewRoutes'));
-app.use('/api/wishlist', require('./routes/wishlistRoutes'));
-app.use('/api/addresses', require('./routes/addressRoutes'));
-app.use('/api/dashboard', require('./routes/dashboardRoutes'));
-
-// ---------- Serve frontend build (single-link deployment) ----------
-// When the frontend is built (frontend/dist), this server hosts both the
-// API and the React app on the same origin/port.
-const frontendDist = path.resolve(__dirname, '..', 'frontend', 'dist');
-const frontendIndex = path.join(frontendDist, 'index.html');
-
-if (fs.existsSync(frontendIndex)) {
-    app.use(express.static(frontendDist));
-
-    // SPA fallback: any non-API GET request returns index.html
-    app.get(/^\/(?!api\/|uploads\/).*/, (req, res) => {
-        res.sendFile(frontendIndex);
-    });
-
-    console.log(`Serving frontend build from ${frontendDist}`);
-} else {
-    console.log('Frontend build not found (frontend/dist). API-only mode.');
-}
-
-// 404 + error handler
-app.use(notFound);
-app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB and seed default data.
-// This runs at module load time so it works BOTH when the app is started
-// directly (local dev: `node server.js`) AND when Vercel imports the app as a
-// serverless function (where `require.main !== module` and startServer() would
-// otherwise never run, leaving the app with no DB connection).
 const startServer = async () => {
     try {
         await connectDB();
         // Seed admin user + default settings if empty
         await require('./config/seed').ensureSeed();
-        if (require.main === module) {
-            app.listen(PORT, () => {
-                console.log(`Freshora backend running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-            });
-        }
+
+        app.listen(PORT, () => {
+            console.log(`Freshora backend running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+        });
     } catch (error) {
         console.error(`Server start error: ${error.message}`);
-        // On Vercel (serverless) we must not exit the process; the function
-        // will surface the error on the first request instead.
-        if (require.main === module) {
-            process.exit(1);
-        }
+        process.exit(1);
     }
 };
 
-// Always connect on load (local + serverless). For local dev this also starts
-// the HTTP listener via app.listen() inside startServer().
 startServer();
 
 module.exports = app;
