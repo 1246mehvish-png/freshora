@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-// On Vercel the frontend and backend are separate services. The "backend"
-// binding injects the backend's internal base URL as BACKEND_URL at runtime
-// (functions only — not during build). Locally this is undefined, so we fall
-// back to the relative "/api" path that the Vite proxy in vite.config.js
-// forwards to http://localhost:5000.
-const API_URL = import.meta.env.VITE_API_URL
-    || (import.meta.env.BACKEND_URL ? `${import.meta.env.BACKEND_URL}/api` : '/api');
+// On Vercel the frontend and backend are separate services. The frontend is a
+// static Vite build, so it reaches the backend through the relative "/api"
+// path, which the top-level rewrite in vercel.json routes to the backend
+// service. Locally, the Vite proxy in vite.config.js forwards "/api" to
+// http://localhost:5000. VITE_API_URL can override the base URL for split
+// deployments.
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
     baseURL: API_URL,
