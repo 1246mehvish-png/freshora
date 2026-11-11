@@ -36,6 +36,12 @@ const allowedOrigins = [
     // Vercel injects the deployment's own hostname; the frontend is served
     // from the same project domain, so allow it for cross-origin calls.
     ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+    // Stable production domain (custom domain or <project>.vercel.app).
+    ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
+        : []),
+    // Preview / branch deployment URL.
+    ...(process.env.VERCEL_BRANCH_URL ? [`https://${process.env.VERCEL_BRANCH_URL}`] : []),
 ]
     .map((o) => o.trim())
     .filter(Boolean);

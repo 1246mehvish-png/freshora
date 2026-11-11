@@ -220,24 +220,33 @@ Open **http://localhost:5000** — frontend and API are on the same link.
 > For development with hot reload, keep using `npm run dev` in `backend/` and `frontend/`
 > (frontend at `http://localhost:5173`, proxying `/api` to the backend).
 
-### Deploy on Render (single service)
-1. Push the repo to GitHub.
-2. **New → Web Service**, connect the repo.
+### Deploy on Vercel (single project, single domain)
+The repo is pre-configured for Vercel:
+- `api/index.js` is the serverless function (root `api/` convention) that exports the Express app.
+- `vercel.json` builds the frontend to `frontend/dist`, routes `/api/*` to the function, and rewrites all other paths to `index.html` (SPA refresh-safe).
+- The frontend calls the relative `/api` path, so no API URL needs to be baked into the build.
+
+1. Push the repo to GitHub (or import the folder directly).
+2. **Add New → Project**, import the repo.
 3. Settings:
    - **Root Directory:** *(leave empty — repo root)*
-   - **Build Command:** `npm run install:all && npm run build`
-   - **Start Command:** `npm start`
-4. **Environment variables** (from `backend/.env`):
+   - **Framework Preset:** `Other`
+   - **Build Command:** `npm run build --prefix frontend` *(auto-filled from `vercel.json`)*
+   - **Output Directory:** `frontend/dist` *(auto-filled from `vercel.json`)*
+   - **Install Command:** `npm install && npm install --prefix frontend` *(auto-filled from `vercel.json`)*
+4. **Environment variables** (Project Settings → Environment Variables, for Production + Preview):
    - `NODE_ENV=production`
-   - `MONGO_URI` (MongoDB Atlas connection string)
+   - `MONGODB_URI` (MongoDB Atlas connection string)
    - `JWT_SECRET`, `JWT_EXPIRES_IN`
    - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
+   - `CLOUDINARY_UPLOAD_PRESET` — optional
    - `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME`
-   - `CLIENT_URL` — optional; set to your Render URL if you also use a separate frontend
-   - Do **not** set `PORT` (Render provides it automatically)
-5. Deploy. Your single link will be `https://<your-service>.onrender.com`.
+   - `CLIENT_URL` — optional; only needed for split deployments
+   - Do **not** set `PORT` (Vercel manages it)
+5. Deploy. Your single link will be `https://<your-project>.vercel.app` (or your custom domain).
 
-> On MongoDB Atlas, add `0.0.0.0/0` to **Network Access** so Render can connect.
+> On MongoDB Atlas, add `0.0.0.0/0` to **Network Access** so Vercel's serverless functions can connect.
+> Verify the deployment with `GET /api/health` — it returns 200 without touching the database.
 
 ---
 
